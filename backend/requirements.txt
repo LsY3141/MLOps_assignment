@@ -5,8 +5,8 @@ pydantic==2.5.3
 pydantic-settings==2.1.0
 
 # AWS SDK
-boto3==1.34.34
-botocore==1.34.34
+boto3
+botocore
 
 # 데이터베이스
 psycopg2-binary==2.9.9
@@ -16,7 +16,7 @@ pgvector==0.2.4
 # LangChain 및 RAG
 langchain==0.1.6
 langchain-community==0.0.19
-langchain-aws==0.0.1
+langchain-aws
 
 # 문서 처리
 PyPDF2==3.0.1
