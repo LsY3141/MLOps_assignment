@@ -1,65 +1,35 @@
-"""
-캠퍼스메이트 백엔드 메인 애플리케이션
-FastAPI 기반 REST API 서버
-"""
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import chat, admin
-from app.utils.config import settings
+from .routers import chat, admin, documents
 
-# FastAPI 앱 초기화
 app = FastAPI(
     title="CampusMate API",
-    description="대학 행정 AI 챗봇 서비스 API",
+    description="API for the University Admin AI Chatbot 'CampusMate'",
     version="1.0.0",
-    docs_url="/docs",
-    redoc_url="/redoc"
 )
 
-# CORS 미들웨어 설정
+# CORS (Cross-Origin Resource Sharing) configuration
+origins = [
+    "http://localhost:3000",
+    "http://54.153.88.46:3000", # Allow access from the public IP
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ALLOWED_ORIGINS,
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# 라우터 등록
-app.include_router(chat.router, prefix="/api/chat", tags=["Chat"])
-app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
-
-
 @app.get("/")
-async def root():
+def read_root():
     """
-    헬스 체크 엔드포인트
+    Root endpoint for health check.
     """
-    return {
-        "service": "CampusMate API",
-        "status": "healthy",
-        "version": "1.0.0"
-    }
+    return {"status": "ok", "message": "Welcome to the CampusMate API!"}
 
 
-@app.get("/health")
-async def health_check():
-    """
-    상세 헬스 체크
-    """
-    return {
-        "status": "ok",
-        "database": "connected",  # TODO: 실제 DB 연결 체크
-        "aws_bedrock": "available"  # TODO: 실제 Bedrock 연결 체크
-    }
-
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(
-        "app.main:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True
-    )
+app.include_router(chat.router, prefix="/api")
+app.include_router(admin.router, prefix="/api")
+app.include_router(documents.router, prefix="/api")

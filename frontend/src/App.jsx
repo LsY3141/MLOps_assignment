@@ -1,56 +1,76 @@
-/**
- * 메인 App 컴포넌트
- */
-
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import ChatInterface from './components/ChatInterface';
-import AdminDashboard from './components/AdminDashboard';
-import './App.css';
+import React, { useState } from 'react';
+import { postQuery } from './services/api';
 
 function App() {
-  return (
-    <Router>
-      <div className="App">
-        <Routes>
-          {/* 메인 챗봇 페이지 */}
-          <Route path="/" element={<ChatInterface />} />
-          
-          {/* 관리자 대시보드 */}
-          <Route path="/admin" element={<AdminDashboard />} />
-          
-          {/* 404 페이지 */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </div>
-    </Router>
-  );
-}
+  const [question, setQuestion] = useState('');
+  const [response, setResponse] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-// 404 페이지 컴포넌트
-const NotFound = () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!question) return;
+
+    setLoading(true);
+    setError(null);
+    setResponse(null);
+
+    try {
+      // Using school_id=1 as a default for now
+      const res = await postQuery(question, 1);
+      setResponse(res.data);
+    } catch (err) {
+      setError('Failed to get a response from the server.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-6xl font-bold text-gray-300 mb-4">404</h1>
-        <p className="text-xl text-gray-600 mb-8">페이지를 찾을 수 없습니다</p>
-        <div className="space-x-4">
-          <Link
-            to="/"
-            className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            홈으로 가기
-          </Link>
-          <Link
-            to="/admin"
-            className="inline-block bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"
-          >
-            관리자 페이지
-          </Link>
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">CampusMate Chat</h1>
+      
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          value={question}
+          onChange={(e) => setQuestion(e.target.value)}
+          placeholder="Ask a question..."
+          className="w-full p-2 border rounded mb-2"
+          disabled={loading}
+        />
+        <button 
+          type="submit" 
+          className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:bg-blue-300"
+          disabled={loading}
+        >
+          {loading ? 'Thinking...' : 'Send'}
+        </button>
+      </form>
+
+      {error && <div className="mt-4 p-4 bg-red-100 text-red-700 rounded">{error}</div>}
+
+      {response && (
+        <div className="mt-4 p-4 border rounded bg-gray-50">
+          <h2 className="font-bold">Answer:</h2>
+          <p className="mb-2">{response.answer}</p>
+          <h3 className="font-semibold">Sources:</h3>
+          {response.source_documents.length > 0 ? (
+            <ul>
+              {response.source_documents.map((doc, index) => (
+                <li key={index} className="text-sm text-gray-600 border-t mt-1 pt-1">
+                  <strong>{doc.source}:</strong> {doc.content}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-gray-500">No sources provided.</p>
+          )}
         </div>
-      </div>
+      )}
     </div>
   );
-};
+}
 
 export default App;

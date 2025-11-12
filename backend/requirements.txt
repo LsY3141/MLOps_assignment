@@ -1,42 +1,13 @@
-# FastAPI 및 웹 프레임워크
-fastapi==0.109.0
-uvicorn[standard]==0.27.0
-pydantic==2.5.3
-pydantic-settings==2.1.0
-
-# AWS SDK
+fastapi
+uvicorn[standard]
+sqlalchemy
+psycopg2-binary
+pgvector
 boto3
-botocore
-
-# 데이터베이스
-psycopg2-binary==2.9.9
-sqlalchemy==2.0.25
-pgvector==0.2.4
-
-# LangChain 및 RAG
-langchain==0.1.6
-langchain-community==0.0.19
+python-dotenv
+langchain
+langchain-community
 langchain-aws
-
-# 문서 처리
-PyPDF2==3.0.1
-python-docx==1.1.0
-python-multipart==0.0.6
-
-# RSS 파싱
-feedparser==6.0.11
-
-# 유틸리티
-python-dotenv==1.0.0
-httpx==0.26.0
-requests==2.31.0
-
-# 테스트
-pytest==7.4.4
-pytest-asyncio==0.23.3
-pytest-cov==4.1.0
-
-# 개발 도구
-black==24.1.1
-flake8==7.0.0
-mypy==1.8.0
+pypdf2
+python-docx
+requests

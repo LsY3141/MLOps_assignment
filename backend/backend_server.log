@@ -1,0 +1,116 @@
+INFO:     Will watch for changes in these directories: ['/home/ec2-user/chatbot-project/backend']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [39873] using WatchFiles
+Process SpawnProcess-1:
+Traceback (most recent call last):
+  File "/usr/lib64/python3.9/multiprocessing/process.py", line 315, in _bootstrap
+    self.run()
+  File "/usr/lib64/python3.9/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/ec2-user/.local/lib/python3.9/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+  File "/home/ec2-user/.local/lib/python3.9/site-packages/uvicorn/server.py", line 62, in run
+    return asyncio.run(self.serve(sockets=sockets))
+  File "/usr/lib64/python3.9/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+  File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+  File "/home/ec2-user/.local/lib/python3.9/site-packages/uvicorn/server.py", line 69, in serve
+    config.load()
+  File "/home/ec2-user/.local/lib/python3.9/site-packages/uvicorn/config.py", line 458, in load
+    self.loaded_app = import_from_string(self.app)
+  File "/home/ec2-user/.local/lib/python3.9/site-packages/uvicorn/importer.py", line 21, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/lib64/python3.9/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1030, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1007, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 986, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 680, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 850, in exec_module
+  File "<frozen importlib._bootstrap>", line 228, in _call_with_frames_removed
+  File "/home/ec2-user/chatbot-project/backend/app/main.py", line 3, in <module>
+    from .routers import chat, admin, documents
+  File "/home/ec2-user/chatbot-project/backend/app/routers/admin.py", line 5, in <module>
+    from app.services import document_service
+  File "/home/ec2-user/chatbot-project/backend/app/services/document_service.py", line 8, in <module>
+    from app import schemas
+  File "/home/ec2-user/chatbot-project/backend/app/schemas.py", line 7, in <module>
+    class RssFeed(RssFeedBase):
+NameError: name 'RssFeedBase' is not defined
+WARNING:  WatchFiles detected changes in 'app/schemas.py'. Reloading...
+INFO:     Started server process [40063]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:55704 - "POST /api/admin/default-contacts HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'app/services/llm_service.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [40063]
+INFO:     Started server process [40248]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'app/services/rag_service.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [40248]
+INFO:     Started server process [40410]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+--- Starting RAG process for question: '국가장학금은 언제 신청하나요?' ---
+--- [1/4] Generating embedding for the question... ---
+--- [2/4] Performing vector search in the database... ---
+--- [3/4] Found 3 relevant chunks. Formatting context... ---
+--- [4/4] Generating final answer with Claude 3 Sonnet... ---
+--- [LLM Service] Generating final answer from Claude 3 Sonnet... ---
+--- [LLM Service] Successfully generated answer. ---
+INFO:     127.0.0.1:56812 - "POST /api/chat/query HTTP/1.1" 200 OK
+--- Starting RAG process for question: '오늘 저녁 메뉴 추천해줘' ---
+--- [1/4] Generating embedding for the question... ---
+--- [2/4] Performing vector search in the database... ---
+--- [3/4] Found 3 relevant chunks. Formatting context... ---
+--- [4/4] Generating final answer with Claude 3 Sonnet... ---
+--- [LLM Service] Generating final answer from Claude 3 Sonnet... ---
+--- [LLM Service] Successfully generated answer. ---
+INFO:     127.0.0.1:54614 - "POST /api/chat/query HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'app/services/rag_service.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [40410]
+INFO:     Started server process [40829]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+--- Starting RAG process for question: '오늘 저녁 메뉴 추천해줘' ---
+--- [Fallback] No relevant docs found or similarity too low (best distance: 17.982051802053032). ---
+--- [LLM Service] Classifying question: '오늘 저녁 메뉴 추천해줘' ---
+--- [LLM Service] Classified question as: other ---
+INFO:     127.0.0.1:46152 - "POST /api/chat/query HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60806 - "OPTIONS /api/chat/query HTTP/1.1" 200 OK
+--- Starting RAG process for question: '최신 정기토익 경진대회에 대해 알려줘' ---
+--- [Fallback] No relevant docs found or similarity too low (best distance: 15.685297230028379). ---
+--- [LLM Service] Classifying question: '최신 정기토익 경진대회에 대해 알려줘' ---
+--- [LLM Service] Classified question as: academics ---
+INFO:     127.0.0.1:60806 - "POST /api/chat/query HTTP/1.1" 200 OK
+--- Starting RAG process for question: '정기토익 경진대회에 대해 알려줘' ---
+--- [Fallback] No relevant docs found or similarity too low (best distance: 15.849279037107452). ---
+--- [LLM Service] Classifying question: '정기토익 경진대회에 대해 알려줘' ---
+--- [LLM Service] Classified question as: academics ---
+INFO:     127.0.0.1:58986 - "POST /api/chat/query HTTP/1.1" 200 OK
+--- Starting RAG process for question: '오늘 날씨 어때' ---
+--- [Fallback] No relevant docs found or similarity too low (best distance: 19.529849949820402). ---
+--- [LLM Service] Classifying question: '오늘 날씨 어때' ---
+--- [LLM Service] Classified question as: other ---
+INFO:     127.0.0.1:53174 - "POST /api/chat/query HTTP/1.1" 200 OK
+--- Starting RAG process for question: '자격증을 따면 주는 장학금이 있나요?' ---
+--- [Fallback] No relevant docs found or similarity too low (best distance: 16.03489979621355). ---
+--- [LLM Service] Classifying question: '자격증을 따면 주는 장학금이 있나요?' ---
+--- [LLM Service] Classified question as: scholarship ---
+INFO:     127.0.0.1:58570 - "POST /api/chat/query HTTP/1.1" 200 OK
+--- Starting RAG process for question: '정기토익 경진대회에 대해 알려줘' ---
+--- [Fallback] No relevant docs found or similarity too low (best distance: 15.849279037107452). ---
+--- [LLM Service] Classifying question: '정기토익 경진대회에 대해 알려줘' ---
+--- [LLM Service] Classified question as: admission ---
+INFO:     127.0.0.1:59180 - "POST /api/chat/query HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50654 - "GET /api/admin/chunks HTTP/1.1" 200 OK
