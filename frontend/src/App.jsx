@@ -1,75 +1,49 @@
-import React, { useState } from 'react';
-import { postQuery } from './services/api';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import ChatInterface from './components/ChatInterface';
+import AdminDashboard from './components/AdminDashboard';
+import DocumentUpload from './components/DocumentUpload';
 
 function App() {
-  const [question, setQuestion] = useState('');
-  const [response, setResponse] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!question) return;
-
-    setLoading(true);
-    setError(null);
-    setResponse(null);
-
-    try {
-      // Using school_id=1 as a default for now
-      const res = await postQuery(question, 1);
-      setResponse(res.data);
-    } catch (err) {
-      setError('Failed to get a response from the server.');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">CampusMate Chat</h1>
-      
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          placeholder="Ask a question..."
-          className="w-full p-2 border rounded mb-2"
-          disabled={loading}
-        />
-        <button 
-          type="submit" 
-          className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:bg-blue-300"
-          disabled={loading}
-        >
-          {loading ? 'Thinking...' : 'Send'}
-        </button>
-      </form>
+    <Router>
+      <div className="min-h-screen bg-gray-50">
+        {/* 네비게이션 바 */}
+        <nav className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between h-16 items-center">
+              <div className="flex space-x-8">
+                <Link
+                  to="/"
+                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 hover:text-blue-600"
+                >
+                  🎓 챗봇
+                </Link>
+                <Link
+                  to="/upload"
+                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-900"
+                >
+                  📄 문서 업로드
+                </Link>
+                <Link
+                  to="/admin"
+                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-900"
+                >
+                  ⚙️ 관리자
+                </Link>
+              </div>
+            </div>
+          </div>
+        </nav>
 
-      {error && <div className="mt-4 p-4 bg-red-100 text-red-700 rounded">{error}</div>}
-
-      {response && (
-        <div className="mt-4 p-4 border rounded bg-gray-50">
-          <h2 className="font-bold">Answer:</h2>
-          <p className="mb-2">{response.answer}</p>
-          <h3 className="font-semibold">Sources:</h3>
-          {response.source_documents.length > 0 ? (
-            <ul>
-              {response.source_documents.map((doc, index) => (
-                <li key={index} className="text-sm text-gray-600 border-t mt-1 pt-1">
-                  <strong>{doc.source}:</strong> {doc.content}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-sm text-gray-500">No sources provided.</p>
-          )}
-        </div>
-      )}
-    </div>
+        {/* 라우트 */}
+        <Routes>
+          <Route path="/" element={<ChatInterface />} />
+          <Route path="/upload" element={<DocumentUpload />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
