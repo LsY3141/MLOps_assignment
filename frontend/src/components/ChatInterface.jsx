@@ -1,13 +1,14 @@
 /**
  * 챗봇 인터페이스 컴포넌트
- * 메인 채팅 화면
+ * 메인 채팅 화면 + 문서 업로드 모달
  */
 
 import React, { useState, useRef, useEffect } from 'react';
 import MessageBubble from './MessageBubble';
 import { chatAPI } from '../services/api';
+import axios from 'axios';
 
-const ChatInterface = ({ schoolId = 'demo_school' }) => {
+const ChatInterface = ({ schoolId = 1 }) => {
   const [messages, setMessages] = useState([
     {
       id: '0',
@@ -20,6 +21,22 @@ const ChatInterface = ({ schoolId = 'demo_school' }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId] = useState(() => `session_${Date.now()}`);
   const messagesEndRef = useRef(null);
+
+  // 문서 업로드 모달 상태
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [uploadFile, setUploadFile] = useState(null);
+  const [uploadCategory, setUploadCategory] = useState('academic');
+  const [uploadDepartment, setUploadDepartment] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [uploadResult, setUploadResult] = useState(null);
+
+  const categories = [
+    { value: 'academic', label: '학사' },
+    { value: 'scholarship', label: '장학' },
+    { value: 'facilities', label: '시설' },
+    { value: 'career', label: '진로/취업' },
+    { value: 'general', label: '일반' },
+  ];
 
   // 메시지 목록 자동 스크롤
   const scrollToBottom = () => {
@@ -88,12 +105,99 @@ const ChatInterface = ({ schoolId = 'demo_school' }) => {
     }
   };
 
+  // 파일 선택
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) {
+      setUploadFile(null);
+      return;
+    }
+
+    if (!file.name.toLowerCase().endsWith('.pdf')) {
+      alert('PDF 파일만 업로드 가능합니다.');
+      setUploadFile(null);
+      return;
+    }
+
+    if (file.size > 50 * 1024 * 1024) {
+      alert('파일 크기는 50MB를 초과할 수 없습니다.');
+      setUploadFile(null);
+      return;
+    }
+
+    setUploadFile(file);
+    setUploadResult(null);
+  };
+
+  // 문서 업로드
+  const handleUpload = async () => {
+    if (!uploadFile) return;
+
+    try {
+      setUploading(true);
+      setUploadResult(null);
+
+      // 1. Presigned URL 요청
+      const { data: presignedData } = await axios.post(
+        `${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/documents/presigned-url`,
+        {
+          school_id: schoolId,
+          category: uploadCategory,
+          file_name: uploadFile.name,
+          department: uploadDepartment || null,
+        }
+      );
+
+      // 2. S3에 직접 업로드
+      await axios.put(presignedData.upload_url, uploadFile, {
+        headers: {
+          'Content-Type': 'application/pdf',
+        },
+      });
+
+      setUploadResult({
+        success: true,
+        message: '문서 업로드 완료! 자동으로 벡터화 처리 중입니다...',
+      });
+
+      // 폼 초기화
+      setUploadFile(null);
+      setUploadDepartment('');
+      document.getElementById('file-upload-input').value = '';
+
+      // 3초 후 모달 닫기
+      setTimeout(() => {
+        setShowUploadModal(false);
+        setUploadResult(null);
+      }, 3000);
+
+    } catch (error) {
+      console.error('Upload error:', error);
+      setUploadResult({
+        success: false,
+        message: error.response?.data?.detail || '업로드 중 오류가 발생했습니다.',
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col h-screen bg-gray-50">
       {/* 헤더 */}
-      <div className="bg-blue-600 text-white p-4 shadow-md">
-        <h1 className="text-xl font-bold">🎓 캠퍼스메이트</h1>
-        <p className="text-sm text-blue-100">대학 행정 AI 도우미</p>
+      <div className="bg-blue-600 text-white p-4 shadow-md flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold">🎓 캠퍼스메이트</h1>
+          <p className="text-sm text-blue-100">대학 행정 AI 도우미</p>
+        </div>
+
+        {/* 문서 업로드 버튼 */}
+        <button
+          onClick={() => setShowUploadModal(true)}
+          className="px-4 py-2 bg-white text-blue-600 rounded-lg font-medium hover:bg-blue-50 transition-colors"
+        >
+          📄 문서 업로드
+        </button>
       </div>
 
       {/* 메시지 영역 */}
@@ -139,6 +243,150 @@ const ChatInterface = ({ schoolId = 'demo_school' }) => {
           </button>
         </div>
       </div>
+
+      {/* 문서 업로드 모달 */}
+      {showUploadModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-800">📄 문서 업로드</h2>
+              <button
+                onClick={() => setShowUploadModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {/* 파일 선택 */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  PDF 파일 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="file-upload-input"
+                  type="file"
+                  accept=".pdf"
+                  onChange={handleFileChange}
+                  disabled={uploading}
+                  className="block w-full text-sm text-gray-500
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-md file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-blue-50 file:text-blue-700
+                    hover:file:bg-blue-100
+                    disabled:opacity-50"
+                />
+                {uploadFile && (
+                  <p className="mt-1 text-sm text-gray-600">
+                    {uploadFile.name} ({(uploadFile.size / 1024 / 1024).toFixed(2)} MB)
+                  </p>
+                )}
+              </div>
+
+              {/* 카테고리 */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  카테고리 <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={uploadCategory}
+                  onChange={(e) => setUploadCategory(e.target.value)}
+                  disabled={uploading}
+                  className="block w-full px-3 py-2 border border-gray-300 rounded-md
+                    focus:outline-none focus:ring-blue-500 focus:border-blue-500
+                    disabled:opacity-50"
+                >
+                  {categories.map((cat) => (
+                    <option key={cat.value} value={cat.value}>
+                      {cat.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 담당 부서 */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  담당 부서 (선택)
+                </label>
+                <input
+                  type="text"
+                  value={uploadDepartment}
+                  onChange={(e) => setUploadDepartment(e.target.value)}
+                  disabled={uploading}
+                  placeholder="예: 학사지원팀"
+                  className="block w-full px-3 py-2 border border-gray-300 rounded-md
+                    focus:outline-none focus:ring-blue-500 focus:border-blue-500
+                    disabled:opacity-50"
+                />
+              </div>
+
+              {/* 업로드 버튼 */}
+              <button
+                onClick={handleUpload}
+                disabled={!uploadFile || uploading}
+                className={`w-full py-3 px-4 rounded-md font-medium text-white transition-colors ${
+                  !uploadFile || uploading
+                    ? 'bg-gray-300 cursor-not-allowed'
+                    : 'bg-blue-600 hover:bg-blue-700'
+                }`}
+              >
+                {uploading ? (
+                  <span className="flex items-center justify-center">
+                    <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        fill="none"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
+                    </svg>
+                    업로드 중...
+                  </span>
+                ) : (
+                  '📤 업로드'
+                )}
+              </button>
+
+              {/* 결과 메시지 */}
+              {uploadResult && (
+                <div
+                  className={`p-3 rounded-md ${
+                    uploadResult.success
+                      ? 'bg-green-50 border border-green-200'
+                      : 'bg-red-50 border border-red-200'
+                  }`}
+                >
+                  <p
+                    className={`text-sm ${
+                      uploadResult.success ? 'text-green-800' : 'text-red-800'
+                    }`}
+                  >
+                    {uploadResult.success ? '✅' : '❌'} {uploadResult.message}
+                  </p>
+                </div>
+              )}
+
+              {/* 안내 */}
+              <div className="text-xs text-gray-500 space-y-1">
+                <p>• PDF 파일만 업로드 가능 (최대 50MB)</p>
+                <p>• 업로드 후 자동으로 벡터화 처리됩니다</p>
+                <p>• 처리 완료 후 챗봇이 검색할 수 있습니다</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
