@@ -1,125 +1,204 @@
 # 🎓 캠퍼스메이트 (CampusMate)
 
-> RAG 기반 대학 행정 AI 챗봇 서비스
+대학 행정 AI 챗봇 - RAG 기반 질의응답 시스템
 
-## 📋 프로젝트 개요
+---
 
-캠퍼스메이트는 대학생들이 학사 행정 정보를 쉽고 빠르게 찾을 수 있도록 돕는 AI 챗봇 서비스입니다.
-RAG(검색 증강 생성) 기술을 활용하여 학교의 최신 공식 문서를 기반으로 정확한 답변을 제공합니다.
+## 🚀 빠른 시작 (EC2)
 
-### 주요 기능
-- ✅ 24/7 자연어 질의응답 (RAG 기반)
-- ✅ 정보 부재 시 담당부서 자동 안내 (Fallback)
-- ✅ RSS 자동 크롤링 및 최신 정보 업데이트
-- ✅ 관리자 문서 업로드 및 관리
-- ✅ 멀티테넌트 지원 (학교별 데이터 격리)
-
-### 기술 스택
-- **Frontend**: React, JavaScript, Tailwind CSS
-- **Backend**: FastAPI, Python 3.11
-- **Database**: PostgreSQL (pgvector)
-- **Infrastructure**: AWS (EC2, S3, RDS, Lambda, EventBridge, Bedrock)
-- **AI/ML**: AWS Bedrock (Claude 3.5 Sonnet, Titan Embeddings)
-
-## 🗂️ 프로젝트 구조
-
-```
-campusmate-project/
-├── frontend/              # React 프론트엔드
-│   ├── src/
-│   │   ├── components/   # UI 컴포넌트
-│   │   ├── services/     # API 호출 로직
-│   │   └── App.jsx
-│   ├── package.json
-│   └── README.md
-│
-├── backend/              # FastAPI 백엔드
-│   ├── app/
-│   │   ├── main.py      # FastAPI 진입점
-│   │   ├── routers/     # API 라우터
-│   │   ├── services/    # 비즈니스 로직
-│   │   ├── database/    # DB 모델
-│   │   └── utils/       # 유틸리티
-│   ├── requirements.txt
-│   └── README.md
-│
-├── lambda/              # AWS Lambda 함수
-│   └── rss_crawler/    # RSS 크롤링 함수
-│
-├── docs/               # 문서
-│   ├── architecture.md
-│   ├── api_specification.md
-│   └── database_erd.md
-│
-└── README.md          # 이 파일
+### 1. 코드 다운로드
+```bash
+git clone <YOUR_REPO_URL>
+cd MLOps_assignment
 ```
 
-## 🚀 빠른 시작
+### 2. 자동 설치 및 설정
+```bash
+./quick_start.sh
+```
 
-### 사전 요구사항
-- Python 3.11+
-- Node.js 18+
-- AWS 계정 (Bedrock, RDS, EC2 등)
-- PostgreSQL 15+ (pgvector 확장)
-
-### 백엔드 설치 및 실행
+### 3. 백엔드 실행
 ```bash
 cd backend
-pip install -r requirements.txt
-uvicorn app.main:app --reload
+source venv/bin/activate
+uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
-### 프론트엔드 설치 및 실행
+### 4. 프론트엔드 실행 (새 터미널)
 ```bash
 cd frontend
-npm install
 npm start
 ```
 
-## 📊 시스템 아키텍처
+### 5. 접속
+- 백엔드: `http://YOUR_EC2_IP:8000/docs`
+- 프론트엔드: `http://YOUR_EC2_IP:3000`
 
-상세한 아키텍처는 [docs/architecture.md](docs/architecture.md)를 참고하세요.
+**⚠️ EC2 보안 그룹에서 포트 8000, 3000 열어주세요!**
 
-## 🔧 환경 변수 설정
+---
 
-백엔드 `.env` 파일 예시:
-```
-AWS_REGION=ap-northeast-2
-AWS_ACCESS_KEY_ID=your_access_key
-AWS_SECRET_ACCESS_KEY=your_secret_key
-DATABASE_URL=postgresql://user:pass@host:5432/dbname
-```
+## 📦 기술 스택
 
-## 📝 API 문서
+### 백엔드
+- **FastAPI** - Python 웹 프레임워크
+- **PostgreSQL + pgvector** - 벡터 데이터베이스
+- **AWS Bedrock** - Claude 3.5 Sonnet (LLM) + Titan Embeddings
+- **S3** - PDF 문서 저장
 
-API 명세는 [docs/api_specification.md](docs/api_specification.md)를 참고하세요.
+### 프론트엔드
+- **React** - UI 프레임워크
+- **TailwindCSS** - 스타일링
 
-서버 실행 후 자동 생성되는 Swagger 문서: `http://localhost:8000/docs`
+---
 
-## 🧪 테스트
+## 🎯 주요 기능
+
+1. **AI 챗봇** - 학생 질문에 대한 자동 답변
+2. **RAG 시스템** - 업로드된 문서 기반 답변 생성
+3. **문서 업로드** - PDF 파일 업로드 및 자동 벡터화
+4. **담당 부서 안내** - 카테고리별 담당 부서 자동 연결
+
+---
+
+## 🔧 수동 설정 (quick_start.sh 없이)
+
+### 백엔드 설정
 
 ```bash
-# 백엔드 테스트
 cd backend
-pytest
 
-# 프론트엔드 테스트
-cd frontend
-npm test
+# 1. 가상환경 생성
+python3 -m venv venv
+source venv/bin/activate
+
+# 2. 패키지 설치
+pip install -r requirements.txt
+
+# 3. .env 파일 생성
+cat > .env << 'EOF'
+AWS_REGION=us-west-1
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/DATABASE
+DB_HOST=your-rds-endpoint.rds.amazonaws.com
+DB_PORT=5432
+DB_NAME=postgres
+DB_USER=postgres
+DB_PASSWORD=your-password
+S3_BUCKET_NAME=your-bucket-name
+S3_REGION=us-west-1
+DEFAULT_SCHOOL_ID=1
+EOF
+
+# 4. 데이터베이스 초기화 (처음 실행 시에만)
+python init_db.py
+
+# 5. 샘플 데이터 입력 (선택사항)
+python init_sample_data.py
+
+# 6. 서버 실행
+uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
-## 📦 배포
+### 프론트엔드 설정
 
-배포 가이드는 [docs/deployment.md](docs/deployment.md)를 참고하세요.
+```bash
+cd frontend
 
-## 🤝 기여
+# 1. .env 파일 생성
+echo "REACT_APP_API_URL=http://localhost:8000" > .env
 
-이슈 및 PR은 언제나 환영합니다!
+# 2. 패키지 설치
+npm install
 
-## 📄 라이선스
+# 3. 서버 실행
+npm start
+```
 
-MIT License
+---
 
-## 📞 문의
+## 📂 프로젝트 구조
 
-프로젝트 관련 문의사항이 있으시면 이슈를 등록해주세요.
+```
+MLOps_assignment/
+├── backend/
+│   ├── app/
+│   │   ├── routers/          # API 엔드포인트
+│   │   ├── services/         # 비즈니스 로직
+│   │   ├── database/         # 데이터베이스 모델
+│   │   └── main.py           # FastAPI 앱
+│   ├── requirements.txt
+│   ├── init_db.py            # DB 테이블 생성
+│   └── init_sample_data.py   # 샘플 데이터
+│
+├── frontend/
+│   ├── src/
+│   │   ├── components/       # React 컴포넌트
+│   │   ├── services/         # API 호출
+│   │   └── App.jsx
+│   └── package.json
+│
+├── quick_start.sh            # 자동 설치 스크립트
+└── README.md
+```
+
+---
+
+## ❓ 문제 해결
+
+### 백엔드가 시작되지 않아요
+```bash
+cd backend
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+### 데이터베이스 연결 오류
+1. `.env` 파일의 DB 정보 확인
+2. RDS 보안 그룹에서 EC2 접근 허용 확인
+
+### 포트가 이미 사용 중이에요
+```bash
+# 프로세스 찾기
+lsof -i :8000
+
+# 종료
+kill -9 <PID>
+```
+
+### 프론트엔드가 백엔드에 연결 안돼요
+1. `frontend/.env`에서 `REACT_APP_API_URL` 확인
+2. 백엔드 실행 여부 확인: `curl http://localhost:8000`
+3. EC2 보안 그룹에서 포트 8000 오픈 확인
+
+---
+
+## 📞 지원
+
+문제가 발생하면 다음을 확인해주세요:
+
+1. **로그 확인**
+   ```bash
+   # 백엔드 로그
+   tail -f backend/server.log
+
+   # 프론트엔드 로그
+   tail -f frontend/frontend.log
+   ```
+
+2. **프로세스 확인**
+   ```bash
+   ps aux | grep uvicorn
+   ps aux | grep node
+   ```
+
+3. **데이터베이스 연결 테스트**
+   ```bash
+   cd backend
+   source venv/bin/activate
+   python -c "from app.database.database import engine; print('DB 연결 성공!')"
+   ```
+
+---
+
+**작성일**: 2025-11-17
+**버전**: 2.0.0

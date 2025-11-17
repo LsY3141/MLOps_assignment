@@ -11,13 +11,13 @@ const MessageBubble = ({ message }) => {
   const isError = message.isError;
 
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
+    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} animate-fadeIn`}>
       <div
-        className={`max-w-3xl px-4 py-3 rounded-lg ${
+        className={`max-w-3xl px-5 py-4 rounded-2xl shadow-md ${
           isUser
-            ? 'bg-blue-600 text-white'
+            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white'
             : isError
-            ? 'bg-red-100 text-red-800 border border-red-300'
+            ? 'bg-red-50 text-red-900 border-2 border-red-300'
             : 'bg-white border border-gray-200 text-gray-800'
         }`}
       >

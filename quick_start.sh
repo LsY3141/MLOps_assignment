@@ -101,13 +101,34 @@ EOF
     fi
 fi
 
-# 데이터베이스 초기화
+# 데이터베이스 확인
 echo ""
-echo "5️⃣  데이터베이스 초기화 중..."
-if python init_db.py; then
-    echo "✅ 데이터베이스 초기화 완료"
+echo "5️⃣  데이터베이스 상태 확인 중..."
+
+# 기존 데이터 확인
+EXISTING_DATA=$(python -c "
+from app.database.database import SessionLocal
+from app.database import models
+db = SessionLocal()
+try:
+    count = db.query(models.School).count() + db.query(models.RssFeed).count()
+    print(count)
+except:
+    print(0)
+finally:
+    db.close()
+" 2>/dev/null)
+
+if [ "$EXISTING_DATA" -gt 0 ]; then
+    echo "ℹ️  기존 데이터 발견 (학교/RSS 피드: $EXISTING_DATA개)"
+    echo "   데이터베이스 초기화를 건너뜁니다 (기존 데이터 보호)"
 else
-    echo "⚠️  데이터베이스 초기화 실패 (이미 초기화되었을 수 있습니다)"
+    echo "   데이터베이스 테이블 생성 중..."
+    if python init_db.py; then
+        echo "✅ 데이터베이스 초기화 완료"
+    else
+        echo "⚠️  데이터베이스 초기화 실패 (이미 초기화되었을 수 있습니다)"
+    fi
 fi
 
 cd ..
