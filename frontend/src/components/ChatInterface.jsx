@@ -183,64 +183,74 @@ const ChatInterface = ({ schoolId = 1 }) => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
       {/* 헤더 */}
-      <div className="bg-blue-600 text-white p-4 shadow-md flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold">🎓 캠퍼스메이트</h1>
-          <p className="text-sm text-blue-100">대학 행정 AI 도우미</p>
-        </div>
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 shadow-lg">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold flex items-center gap-2">
+              🎓 캠퍼스메이트
+            </h1>
+            <p className="text-sm text-blue-100 mt-1">대학 행정 업무를 쉽고 빠르게 도와드립니다</p>
+          </div>
 
-        {/* 문서 업로드 버튼 */}
-        <button
-          onClick={() => setShowUploadModal(true)}
-          className="px-4 py-2 bg-white text-blue-600 rounded-lg font-medium hover:bg-blue-50 transition-colors"
-        >
-          📄 문서 업로드
-        </button>
+          {/* 문서 업로드 버튼 */}
+          <button
+            onClick={() => setShowUploadModal(true)}
+            className="px-5 py-2.5 bg-white text-blue-600 rounded-lg font-medium hover:bg-blue-50 transition-all shadow-md hover:shadow-lg"
+          >
+            📄 문서 업로드
+          </button>
+        </div>
       </div>
 
       {/* 메시지 영역 */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((message) => (
-          <MessageBubble key={message.id} message={message} />
-        ))}
+      <div className="flex-1 overflow-y-auto p-6">
+        <div className="max-w-4xl mx-auto space-y-6">
+          {messages.map((message) => (
+            <MessageBubble key={message.id} message={message} />
+          ))}
 
-        {isLoading && (
-          <div className="flex items-center space-x-2 text-gray-500">
-            <div className="animate-bounce">●</div>
-            <div className="animate-bounce delay-100">●</div>
-            <div className="animate-bounce delay-200">●</div>
-            <span className="ml-2">답변을 생성하고 있습니다...</span>
-          </div>
-        )}
+          {isLoading && (
+            <div className="flex items-center space-x-2 text-gray-600">
+              <div className="flex space-x-1">
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+              </div>
+              <span className="ml-2 text-sm">답변을 생성하고 있습니다...</span>
+            </div>
+          )}
 
-        <div ref={messagesEndRef} />
+          <div ref={messagesEndRef} />
+        </div>
       </div>
 
       {/* 입력 영역 */}
-      <div className="bg-white border-t border-gray-200 p-4">
-        <div className="max-w-4xl mx-auto flex items-end space-x-2">
-          <textarea
-            className="flex-1 border border-gray-300 rounded-lg p-3 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-            rows="2"
-            placeholder="궁금한 점을 입력해주세요... (예: 휴학 신청은 어떻게 하나요?)"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={handleKeyPress}
-            disabled={isLoading}
-          />
-          <button
-            className={`px-6 py-3 rounded-lg font-medium transition-colors ${
-              isLoading || !inputValue.trim()
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-blue-600 text-white hover:bg-blue-700'
-            }`}
-            onClick={handleSendMessage}
-            disabled={isLoading || !inputValue.trim()}
-          >
-            전송
-          </button>
+      <div className="bg-white border-t border-gray-200 p-6 shadow-lg">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-end space-x-3">
+            <textarea
+              className="flex-1 border-2 border-gray-300 rounded-xl p-4 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              rows="2"
+              placeholder="궁금한 점을 입력해주세요... (예: 휴학 신청은 어떻게 하나요?)"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyPress={handleKeyPress}
+              disabled={isLoading}
+            />
+            <button
+              className={`px-8 py-4 rounded-xl font-semibold transition-all shadow-md hover:shadow-lg ${
+                isLoading || !inputValue.trim()
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700'
+              }`}
+              onClick={handleSendMessage}
+              disabled={isLoading || !inputValue.trim()}
+            >
+              전송
+            </button>
+          </div>
         </div>
       </div>
 
