@@ -120,9 +120,34 @@ DEFAULT_SCHOOL_ID=1
 
 **저장:** `Ctrl+O` → Enter → `Ctrl+X`
 
-### 2.5 데이터베이스 테이블 생성
+### 2.5 데이터베이스 테이블 생성 (선택사항)
+
+**⚠️ 주의:** 이 단계는 데이터베이스가 **완전히 비어있는 경우**에만 필요합니다.
+기존 데이터가 있다면 이 단계를 건너뛰세요!
+
+**데이터 확인 먼저 (권장):**
 ```bash
-python init_db.py
+python -c "
+from app.database.database import SessionLocal
+from app.database import models
+db = SessionLocal()
+try:
+    print(f'학교 수: {db.query(models.School).count()}')
+    print(f'RSS 피드 수: {db.query(models.RssFeed).count()}')
+    print(f'문서 수: {db.query(models.Document).count()}')
+finally:
+    db.close()
+"
+```
+
+**결과가 모두 0이면** 테이블 생성 실행:
+```bash
+python init_db.py  # 기존 데이터 유지, 누락된 테이블만 생성
+```
+
+**⛔ 절대 사용하지 마세요:**
+```bash
+python init_db.py --recreate  # 모든 데이터 삭제! 위험!
 ```
 
 **성공 메시지:**
