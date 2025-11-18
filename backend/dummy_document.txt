@@ -1,1 +1,0 @@
-This is a dummy document for testing the file upload functionality.
