@@ -34,7 +34,7 @@ def init_aws_clients():
                 embeddings = BedrockEmbeddings(
                     client=bedrock_runtime_client,
                     region_name=settings.AWS_REGION,
-                    model_id="cohere.embed-v4:0" # cohere.embed-multilingual-v3.0
+                    model_id="us.cohere.embed-v4:0"  # Cohere Embed v4 inference profile for cross-region
                 )
             except Exception as e:
                 st.warning(f"임베딩 모델 초기화 실패: {str(e)}")
