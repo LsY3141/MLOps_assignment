@@ -34,7 +34,7 @@ def init_aws_clients():
                 embeddings = BedrockEmbeddings(
                     client=bedrock_runtime_client,
                     region_name=settings.AWS_REGION,
-                    model_id="amazon.titan-embed-text-v2:0"  # Amazon Titan Embed v2 (consistent with Lambda)
+                    model_id="cohere.embed-multilingual-v3"  # Cohere Embed Multilingual v3 (stable, supports Korean)
                 )
             except Exception as e:
                 st.warning(f"임베딩 모델 초기화 실패: {str(e)}")
